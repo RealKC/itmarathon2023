@@ -348,59 +348,170 @@ int Execute::cmp(InstructionData data, DataCache& load_store, Memory& memory)
 
 int Execute::jmp(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
-    ip = data.src1.value;
-    return 5;
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
+    ip = addr;
+    return cycle_count;
 }
 
 int Execute::je(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
     if (get_e())
-        ip = data.src1.value;
+        ip = addr;
     return 5;
 }
 
 int Execute::jl(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
     if (!get_g() && !get_z())
-        ip = data.src1.value;
+        ip = addr;
     return 0;
 }
 
 int Execute::jg(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
     if (get_g())
-        ip = data.src1.value;
+        ip = addr;
     return 0;
 }
 
 int Execute::jz(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
     if (get_z())
-        ip = data.src1.value;
+        ip = addr;
     return 0;
 }
 
 int Execute::call(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
-    return 0;
+    uint16_t addr;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        addr = reg(data.src1);
+    } else if (data.src1.type == OperandType::Address) {
+        addr = load_store.read_word(memory, data.src1.value, cycle_count);
+    } else {
+        addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    }
+    load_store.write_word(memory, sp, ip, cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, flags, cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[0], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[1], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[2], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[3], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[4], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[5], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[6], cycle_count);
+    sp -= 2;
+    load_store.write_word(memory, sp, registers[7], cycle_count);
+    sp -= 2;
+    ip = addr;
+    return cycle_count;
 }
 
 int Execute::ret(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
-    return 0;
+    int cycle_count = 0;
+    registers[7] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[6] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[5] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[4] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[3] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[2] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[1] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    registers[0] = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    flags = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    ip = load_store.read_word(memory, sp, cycle_count);
+    sp += 2;
+    return cycle_count;
 }
 
 int Execute::end_sim(InstructionData data, DataCache& load_store, Memory& memory)
 {
+    std::cout << "Simulatorul a luat sfarsit!\n";
+    for (int i = 0; i < 8; i++) {
+        std::cout << "R" << i << ": " << std::hex << registers[i] << "\n";
+    }
+    std::cout << "SP: " << std::hex << sp << "\n";
+    std::cout << "G: " << get_g() << "\n";
+    std::cout << "Z: " << get_z() << "\n";
+    std::cout << "E: " << get_e() << "\n";
+
+    exit(0);
     return 0;
 }
 
 int Execute::push(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+    int cycle_count;
+    load_store.write_word(memory, sp, data.src1.value, cycle_count);
+    sp -= 2;
+    return cycle_count;
 }
 
 int Execute::pop(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+    int cycle_count;
+    registers[2] = load_store.read_word(memory, sp, cycle_count);
+    return cycle_count;
 }
