@@ -55,6 +55,40 @@ int Execute::add(InstructionData data, DataCache& load_store, Memory& memory)
 
 int Execute::sub(InstructionData data, DataCache& load_store, Memory& memory)
 {
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        if (is_register_operand(data.src2.type)) {
+            reg(data.src1) -= reg(data.src2);
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                reg(data.src1) -= load_store.read_word(memory, reg(data.src2), cycle_count);
+            case OperandType::Address:
+                reg(data.src1) -= load_store.read_word(memory, data.src2.value, cycle_count);
+            case OperandType::Immediate:
+                reg(data.src1) -= data.src2.value;
+            }
+            return cycle_count;
+        }
+    } else {
+        auto left = load_store.read_word(memory, data.src1.value, cycle_count);
+
+        if (is_register_operand(data.src2.type)) {
+            load_store.write_word(memory, data.src1.value, left - registers[data.src2.type], cycle_count);
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                load_store.write_word(memory, data.src1.value, left - load_store.read_word(memory, reg(data.src2), cycle_count), cycle_count);
+            case OperandType::Address:
+                load_store.write_word(memory, data.src1.value, left - load_store.read_word(memory, data.src2.value, cycle_count), cycle_count);
+            case OperandType::Immediate:
+                load_store.write_word(memory, data.src1.value, left - data.src2.value, cycle_count);
+            }
+            return cycle_count;
+        }
+    }
     return 0;
 }
 
