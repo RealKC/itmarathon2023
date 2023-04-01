@@ -354,8 +354,10 @@ int Execute::jmp(InstructionData data, DataCache& load_store, Memory& memory, ui
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     ip = addr;
     return cycle_count;
@@ -369,8 +371,10 @@ int Execute::je(InstructionData data, DataCache& load_store, Memory& memory, uin
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     if (get_e())
         ip = addr;
@@ -385,8 +389,10 @@ int Execute::jl(InstructionData data, DataCache& load_store, Memory& memory, uin
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     if (!get_g() && !get_z())
         ip = addr;
@@ -401,8 +407,10 @@ int Execute::jg(InstructionData data, DataCache& load_store, Memory& memory, uin
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     if (get_g())
         ip = addr;
@@ -417,8 +425,10 @@ int Execute::jz(InstructionData data, DataCache& load_store, Memory& memory, uin
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     if (get_z())
         ip = addr;
@@ -433,8 +443,10 @@ int Execute::call(InstructionData data, DataCache& load_store, Memory& memory, u
         addr = reg(data.src1);
     } else if (data.src1.type == OperandType::Address) {
         addr = load_store.read_word(memory, data.src1.value, cycle_count);
-    } else {
+    } else if (data.src1.type == OperandType::AddressInRegister) {
         addr = load_store.read_word(memory, registers[data.src1.value], cycle_count);
+    } else {
+        addr = data.src1.value;
     }
     load_store.write_word(memory, sp, ip, cycle_count);
     sp -= 2;
@@ -514,4 +526,57 @@ int Execute::pop(InstructionData data, DataCache& load_store, Memory& memory)
     int cycle_count;
     registers[2] = load_store.read_word(memory, sp, cycle_count);
     return cycle_count;
+}
+int Execute::dispatch(InstructionData insn, DataCache& ls, Memory& mem, std::uint16_t& ip, bool& is_exit)
+{
+    switch (insn.opcode) {
+    case Opcode::Add:
+        return add(insn, ls, mem);
+
+    case Opcode::Sub:
+        return sub(insn, ls, mem);
+
+    case Opcode::Mov:
+        return mov(insn, ls, mem);
+
+    case Opcode::Mul:
+        return mul(insn, ls, mem);
+
+    case Opcode::Div:
+        return div(insn, ls, mem);
+
+    case Opcode::Cmp:
+        return cmp(insn, ls, mem);
+
+    case Opcode::Jmp:
+        return jmp(insn, ls, mem, ip);
+
+    case Opcode::Je:
+        return je(insn, ls, mem, ip);
+
+    case Opcode::Jl:
+        return jl(insn, ls, mem, ip);
+
+    case Opcode::Jg:
+        return jg(insn, ls, mem, ip);
+
+    case Opcode::Jz:
+        return jz(insn, ls, mem, ip);
+
+    case Opcode::Call:
+        return call(insn, ls, mem, ip);
+
+    case Opcode::Ret:
+        return ret(insn, ls, mem, ip);
+
+    case Opcode::EndSim:
+        is_exit = true;
+        return end_sim(insn, ls, mem);
+
+    case Opcode::Push:
+        return push(insn, ls, mem);
+
+    case Opcode::Pop:
+        return pop(insn, ls, mem);
+    }
 }

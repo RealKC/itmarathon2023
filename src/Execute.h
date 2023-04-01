@@ -14,6 +14,8 @@ public:
 
     void reset();
 
+    int dispatch(InstructionData, DataCache&, Memory&, std::uint16_t& ip, bool& is_exit);
+
     int add(InstructionData, DataCache&, Memory&);
     int sub(InstructionData, DataCache&, Memory&);
     int mov(InstructionData, DataCache&, Memory&);
