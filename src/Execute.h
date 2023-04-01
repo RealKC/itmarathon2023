@@ -14,6 +14,10 @@ public:
 
     void reset();
 
+    std::uint16_t get_sp() { return sp; }
+    void dump_gprs();
+    void dump_flags();
+
     int dispatch(InstructionData, DataCache&, Memory&, std::uint16_t& ip, bool& is_exit);
 
     int add(InstructionData, DataCache&, Memory&);

@@ -14,6 +14,8 @@ public:
     void run_cycles(Memory&);
 
 private:
+    void dump_state();
+
     std::uint16_t IP;
 
     InstructionCache IC;

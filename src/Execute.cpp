@@ -504,16 +504,6 @@ int Execute::ret(InstructionData data, DataCache& load_store, Memory& memory, ui
 
 int Execute::end_sim(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    std::cout << "Simulatorul a luat sfarsit!\n";
-    for (int i = 0; i < 8; i++) {
-        std::cout << "R" << i << ": " << std::hex << registers[i] << "\n";
-    }
-    std::cout << "SP: " << std::hex << sp << "\n";
-    std::cout << "G: " << get_g() << "\n";
-    std::cout << "Z: " << get_z() << "\n";
-    std::cout << "E: " << get_e() << "\n";
-
-    exit(0);
     return 0;
 }
 
@@ -583,4 +573,19 @@ int Execute::dispatch(InstructionData insn, DataCache& ls, Memory& mem, std::uin
     case Opcode::Pop:
         return pop(insn, ls, mem);
     }
+}
+
+void Execute::dump_gprs()
+{
+    std::cout << std::hex;
+    std::cout << "    R0 = " << registers[0] << " R1 = " << registers[1] << std::endl;
+    std::cout << "    R2 = " << registers[2] << " R3 = " << registers[3] << std::endl;
+    std::cout << "    R4 = " << registers[4] << " R5 = " << registers[5] << std::endl;
+    std::cout << "    R6 = " << registers[6] << " R7 = " << registers[7] << std::endl;
+    std::cout << std::dec;
+}
+
+void Execute::dump_flags()
+{
+    std::cout << "    Z = " << get_z() << " E = " << get_e() << " G = " << get_g();
 }
