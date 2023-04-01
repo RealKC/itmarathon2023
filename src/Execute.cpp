@@ -89,12 +89,42 @@ int Execute::sub(InstructionData data, DataCache& load_store, Memory& memory)
             return cycle_count;
         }
     }
-    return 0;
 }
 
 int Execute::mov(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        if (is_register_operand(data.src2.type)) {
+            reg(data.src1) = reg(data.src2);
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                reg(data.src1) = load_store.read_word(memory, reg(data.src2), cycle_count);
+            case OperandType::Address:
+                reg(data.src1) = load_store.read_word(memory, data.src2.value, cycle_count);
+            case OperandType::Immediate:
+                reg(data.src1) = data.src2.value;
+            }
+            return cycle_count;
+        }
+    } else {
+        if (is_register_operand(data.src2.type)) {
+            load_store.write_word(memory, data.src1.value, registers[data.src2.type], cycle_count);
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                load_store.write_word(memory, data.src1.value, load_store.read_word(memory, reg(data.src2), cycle_count), cycle_count);
+            case OperandType::Address:
+                load_store.write_word(memory, data.src1.value, load_store.read_word(memory, data.src2.value, cycle_count), cycle_count);
+            case OperandType::Immediate:
+                load_store.write_word(memory, data.src1.value, data.src2.value, cycle_count);
+            }
+            return cycle_count;
+        }
+    }
 }
 
 int Execute::mul(InstructionData data, DataCache& load_store, Memory& memory)
