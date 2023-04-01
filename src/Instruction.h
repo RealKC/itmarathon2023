@@ -1,21 +1,24 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 enum OperandType : std::uint16_t {
     None = 0,
-    R0 = 0'0001,
-    R1 = 0'0010,
-    R2 = 0'0011,
-    R3 = 0'0100,
-    R4 = 0'0101,
-    R5 = 0'0110,
-    R6 = 0'0111,
-    R7 = 0'1000,
-    Immediate = 1'0000,
-    Address = 1'0001,
-    AddressInRegister = 1'0010,
+    R0 = 0b0'0001,
+    R1 = 0b0'0010,
+    R2 = 0b0'0011,
+    R3 = 0b0'0100,
+    R4 = 0b0'0101,
+    R5 = 0b0'0110,
+    R6 = 0b0'0111,
+    R7 = 0b0'1000,
+    Immediate = 0b1'0000,
+    Address = 0b1'0001,
+    AddressInRegister = 0b1'0010,
 };
+
+bool is_register_operand(OperandType);
 
 struct Operand {
     OperandType type { OperandType::None };
@@ -24,28 +27,29 @@ struct Operand {
 };
 
 enum class Opcode {
-    Add = 00'0001,
-    Sub = 00'0010,
-    Mov = 00'0011,
-    Mul = 00'0100,
-    Div = 00'0101,
-    Cmp = 00'0110,
-    Jmp = 00'0111,
-    Je = 00'1001,
-    Jl = 00'01010,
-    Jg = 00'1011,
-    Jz = 00'1100,
-    Call = 00'1101,
-    Ret = 00'1110,
-    EndSim = 00'1111,
-    Push = 01'0000,
-    Pop = 01'0001,
+    Add = 0b00'0001,
+    Sub = 0b00'0010,
+    Mov = 0b00'0011,
+    Mul = 0b00'0100,
+    Div = 0b00'0101,
+    Cmp = 0b00'0110,
+    Jmp = 0b00'0111,
+    Je = 0b00'1001,
+    Jl = 0b00'01010,
+    Jg = 0b00'1011,
+    Jz = 0b00'1100,
+    Call = 0b00'1101,
+    Ret = 0b00'1110,
+    EndSim = 0b00'1111,
+    Push = 0b01'0000,
+    Pop = 0b01'0001,
 };
 
 struct InstructionData {
     Opcode opcode;
     Operand src1 { OperandType::None };
     Operand src2 { OperandType::None };
+    std::string to_string();
 };
 
 // FIXME: /// Returns the number of cycles this instruction took to execute
