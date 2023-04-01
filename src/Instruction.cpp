@@ -169,7 +169,7 @@ std::string InstructionData::to_string()
         str += " [" + std::to_string(src1.value) + "]";
     } else if (this->src1.type == OperandType::AddressInRegister) {
         str += " [" + std::to_string(src1.value) + "]";
-    } else {
+    } else if (this->src1.type == OperandType::Immediate) {
         str += " " + std::to_string(src1.value);
     }
 
@@ -179,7 +179,7 @@ std::string InstructionData::to_string()
         str += " [" + std::to_string(src2.value) + "]";
     } else if (this->src2.type == OperandType::AddressInRegister) {
         str += " [" + std::to_string(src2.value) + "]";
-    } else {
+    } else if (this->src2.type == OperandType::Immediate) {
         str += " " + std::to_string(src2.value);
     }
     return str;
