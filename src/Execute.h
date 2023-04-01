@@ -34,6 +34,10 @@ public:
 private:
     uint16_t& reg(Operand);
 
+    void set_e(bool val);
+    void set_g(bool val);
+    void set_z(bool val);
+
     std::array<uint16_t, 8> registers { 0 };
     uint16_t sp { 0 }, flags { 0 };
 };

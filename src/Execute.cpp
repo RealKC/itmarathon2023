@@ -20,6 +20,33 @@ void Execute::reset()
     flags = 0;
 }
 
+void Execute::set_z(bool val)
+{
+    if (val) {
+        flags |= 1;
+    } else {
+        flags &= ~1u;
+    }
+}
+
+void Execute::set_e(bool val)
+{
+    if (val) {
+        flags |= 2;
+    } else {
+        flags &= ~2u;
+    }
+}
+
+void Execute::set_g(bool val)
+{
+    if (val) {
+        flags |= 4;
+    } else {
+        flags &= ~4u;
+    }
+}
+
 uint16_t& Execute::reg(Operand operand)
 {
     assert(OperandType::R0 <= operand.type && operand.type <= OperandType::R7);
