@@ -8,7 +8,9 @@
 #include <cstring>
 #include <iostream>
 
-Execute::Execute()
+Execute::Execute(std::uint16_t stack_base, std::uint16_t stack_size)
+    : m_stack_base(stack_base)
+    , m_stack_size(stack_size)
 {
     reset();
 }
@@ -16,7 +18,7 @@ Execute::Execute()
 void Execute::reset()
 {
     memset(registers.data(), 0, registers.size() * sizeof(registers[0]));
-    sp = 0;
+    sp = m_stack_base;
     flags = 0;
 }
 

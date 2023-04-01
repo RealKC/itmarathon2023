@@ -10,7 +10,7 @@
 
 class Execute {
 public:
-    Execute();
+    Execute(std::uint16_t stack_base, std::uint16_t stack_size);
 
     void reset();
 
@@ -40,4 +40,7 @@ private:
 
     std::array<uint16_t, 8> registers { 0 };
     uint16_t sp { 0 }, flags { 0 };
+
+    std::uint16_t m_stack_base;
+    std::uint16_t m_stack_size;
 };
