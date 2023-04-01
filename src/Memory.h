@@ -11,9 +11,12 @@
 class Memory {
 private:
     std::array<uint16_t, 1 << 16> memory;
+
 public:
-    uint64_t read(uint16_t address);
     Memory(std::string path);
+
+    uint64_t read(uint16_t address);
+    void write(uint16_t address, uint64_t packet, int n_words);
 };
 
 #endif // ITMARATHON2023_MEMORY_H
