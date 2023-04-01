@@ -10,7 +10,7 @@ DataCache::DataCache()
 
 std::uint64_t DataCache::get_fetch_window(Memory& memory, uint16_t addr, int& cycle_count)
 {
-    if (m_last_read_address <= addr && addr <= m_last_read_address + CACHE_SIZE && m_has_populated_the_cache) {
+    if (m_last_read_address <= addr && addr <= m_last_read_address + CACHE_SIZE * 2 && m_has_populated_the_cache) {
         cycle_count += 7;
     } else {
         // If we get a cache miss, we just repopulate the entire cache
@@ -19,7 +19,7 @@ std::uint64_t DataCache::get_fetch_window(Memory& memory, uint16_t addr, int& cy
         cycle_count += 15;
     }
 
-    auto idx = addr % m_last_read_address;
+    auto idx = (addr % m_last_read_address) / 2;
     return static_cast<uint64_t>(m_cache[idx]) << 48
         | static_cast<uint64_t>(m_cache[idx + 1]) << 32
         | static_cast<uint64_t>(m_cache[idx + 2]) << 16
@@ -32,7 +32,7 @@ void DataCache::populate_cache(Memory& memory, std::uint16_t starting_addr)
     m_last_read_address = starting_addr;
 
     for (auto offset = 0; offset <= CACHE_SIZE; offset += 4) {
-        auto packet = memory.read(starting_addr + offset);
+        auto packet = memory.read(starting_addr + offset * 2);
         m_cache[offset] = packet >> 48;
         m_cache[offset + 1] = packet >> 32;
         m_cache[offset + 2] = packet >> 16;
@@ -76,7 +76,6 @@ void DataCache::write_word(Memory& memory, uint16_t addr, uint16_t word, int& cy
 
     if (m_last_write_address <= addr && addr < m_last_write_address + 4 && m_has_populated_the_cache) {
         auto idx = ((addr - 1) % m_last_write_address);
-        std::cout << "idx = " << idx << std::endl;
         if (idx <= m_packet_idx) {
             m_packet[idx] = word;
         } else {
