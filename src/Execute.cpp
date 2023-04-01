@@ -5,7 +5,20 @@
 #include "Execute.h"
 
 #include <cassert>
+#include <cstring>
 #include <iostream>
+
+Execute::Execute()
+{
+    reset();
+}
+
+void Execute::reset()
+{
+    memset(registers.data(), 0, registers.size() * sizeof(registers[0]));
+    sp = 0;
+    flags = 0;
+}
 
 uint16_t& Execute::reg(Operand operand)
 {

@@ -10,10 +10,9 @@
 
 class Execute {
 public:
-    std::array<uint16_t, 8> registers { 0 };
-    uint16_t sp { 0 }, flags { 0 };
+    Execute();
 
-    uint16_t& reg(Operand);
+    void reset();
 
     int add(InstructionData, DataCache&, Memory&);
     int sub(InstructionData, DataCache&, Memory&);
@@ -31,4 +30,10 @@ public:
     int end_sim(InstructionData, DataCache&, Memory&);
     int push(InstructionData, DataCache&, Memory&);
     int pop(InstructionData, DataCache&, Memory&);
+
+private:
+    uint16_t& reg(Operand);
+
+    std::array<uint16_t, 8> registers { 0 };
+    uint16_t sp { 0 }, flags { 0 };
 };
