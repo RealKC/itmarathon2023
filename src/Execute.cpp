@@ -344,7 +344,7 @@ int Execute::cmp(InstructionData data, DataCache& load_store, Memory& memory)
         val2 = reg(data.src2);
     else
         val2 = data.src2.value;
-    set_z(val1 == val2 == 0);
+    set_z((val1 == val2) && (val1 == 0));
     set_e(val1 == val2);
     set_g(val1 > val2);
     return 5;
