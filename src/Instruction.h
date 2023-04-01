@@ -46,24 +46,12 @@ struct InstructionData {
     Opcode opcode;
     Operand src1 { OperandType::None };
     Operand src2 { OperandType::None };
-
-    /// Returns the size of this instruction in 16-bit words.
-    [[nodiscard]] int size() const {
-        int size = 1;
-
-        if (src1.type != OperandType::None) {
-            size += 1;
-        }
-
-        if (src2.type != OperandType::None) {
-            size += 1;
-        }
-
-        return size;
-    }
 };
 
 // FIXME: /// Returns the number of cycles this instruction took to execute
 // FIXME: using Instruction = int(*)(InstructionData, Memory&);
+
+/// Returns the size of the instruction from the header
+[[nodiscard]] std::size_t instruction_size(std::uint16_t header);
 
 InstructionData decode_instruction(std::uint16_t header, std::uint16_t src1, std::uint16_t src2);
