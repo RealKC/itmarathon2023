@@ -43,7 +43,7 @@ void DataCache::populate_cache(Memory& memory, std::uint16_t starting_addr)
 std::uint16_t DataCache::read_word(Memory& memory, uint16_t addr, int& cycle_count)
 {
     if ((addr & 1) == 1) {
-        // FIXME: implement exception for misaligned access
+        std::cout << "[EXCEPTION] Tried reading from unaligned address: " << addr << "(0x" << std::hex << addr << std::dec << ")\n";
         return 0;
     }
 
@@ -63,7 +63,7 @@ std::uint16_t DataCache::read_word(Memory& memory, uint16_t addr, int& cycle_cou
 void DataCache::write_word(Memory& memory, uint16_t addr, uint16_t word, int& cycle_count)
 {
     if ((addr & 1) == 1) {
-        // FIXME: Notify about exception
+        std::cout << "[EXCEPTION] Tried writing to unaligned address: " << addr << "(0x" << std::hex << addr << std::dec << ")\n";
         return;
     }
 

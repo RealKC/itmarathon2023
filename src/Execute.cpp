@@ -288,17 +288,34 @@ int Execute::div(InstructionData data, DataCache& load_store, Memory& memory)
             return cycle_count;
         } else {
             switch (data.src2.type) {
-            case OperandType::AddressInRegister:
-                registers[0] = reg(data.src1) / load_store.read_word(memory, reg(data.src2), cycle_count);
-                registers[1] = reg(data.src1) % load_store.read_word(memory, reg(data.src2), cycle_count);
+            case OperandType::AddressInRegister: {
+                auto right = load_store.read_word(memory, reg(data.src2), cycle_count);
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = reg(data.src1) / right;
+                registers[1] = reg(data.src1) % right;
                 break;
-            case OperandType::Address:
-                registers[0] = reg(data.src1) / load_store.read_word(memory, data.src2.value, cycle_count);
-                registers[1] = reg(data.src1) % load_store.read_word(memory, data.src2.value, cycle_count);
+            }
+            case OperandType::Address: {
+                auto right = load_store.read_word(memory, data.src2.value, cycle_count);
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = reg(data.src1) / right;
+                registers[1] = reg(data.src1) % right;
                 break;
+            }
             case OperandType::Immediate:
-                registers[0] = reg(data.src1) / data.src2.value;
-                registers[1] = reg(data.src1) % data.src2.value;
+                auto right = data.src2.value;
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = reg(data.src1) / right;
+                registers[1] = reg(data.src1) % right;
                 break;
             }
             set_z(registers[0] == 0);
@@ -314,18 +331,36 @@ int Execute::div(InstructionData data, DataCache& load_store, Memory& memory)
             return cycle_count;
         } else {
             switch (data.src2.type) {
-            case OperandType::AddressInRegister:
-                registers[0] = left / load_store.read_word(memory, reg(data.src2), cycle_count);
-                registers[1] = left % load_store.read_word(memory, reg(data.src2), cycle_count);
+            case OperandType::AddressInRegister: {
+                auto right = load_store.read_word(memory, reg(data.src2), cycle_count);
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = left / right;
+                registers[1] = left % right;
                 break;
-            case OperandType::Address:
-                registers[0] = left / load_store.read_word(memory, data.src2.value, cycle_count);
-                registers[1] = left % load_store.read_word(memory, data.src2.value, cycle_count);
+            }
+            case OperandType::Address: {
+                auto right = load_store.read_word(memory, data.src2.value, cycle_count);
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = left / right;
+                registers[1] = left % right;
                 break;
-            case OperandType::Immediate:
-                registers[0] = left / data.src2.value;
-                registers[1] = left % data.src2.value;
+            }
+            case OperandType::Immediate: {
+                auto right = data.src2.value;
+                if (right == 0) {
+                    std::cout << "[EXCEPTION] Tried dividing by 0\n";
+                    return cycle_count;
+                }
+                registers[0] = left / right;
+                registers[1] = left % right;
                 break;
+            }
             }
             set_z(registers[0] == 0);
             return cycle_count;
