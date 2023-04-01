@@ -46,6 +46,7 @@ bool is_register_operand(OperandType type)
     case None:
     case Immediate:
     case Address:
+    case AddressInRegister:
         return false;
     default:
         return true;
