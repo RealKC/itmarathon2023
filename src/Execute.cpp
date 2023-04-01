@@ -62,16 +62,21 @@ int Execute::add(InstructionData data, DataCache& load_store, Memory& memory)
     if (is_register_operand(data.src1.type)) {
         if (is_register_operand(data.src2.type)) {
             reg(data.src1) += reg(data.src2);
+            set_z(reg(data.src1) == 0);
             return cycle_count;
         } else {
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 reg(data.src1) += load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
             case OperandType::Address:
                 reg(data.src1) += load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
             case OperandType::Immediate:
                 reg(data.src1) += data.src2.value;
+                break;
             }
+            set_z(reg(data.src1) == 0);
             return cycle_count;
         }
     } else {
@@ -79,16 +84,23 @@ int Execute::add(InstructionData data, DataCache& load_store, Memory& memory)
 
         if (is_register_operand(data.src2.type)) {
             load_store.write_word(memory, data.src1.value, left + registers[data.src2.type], cycle_count);
+            int tmp;
+            set_z(load_store.read_word(memory, data.src1.value, tmp) == 0);
             return cycle_count;
         } else {
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 load_store.write_word(memory, data.src1.value, left + load_store.read_word(memory, reg(data.src2), cycle_count), cycle_count);
+                break;
             case OperandType::Address:
                 load_store.write_word(memory, data.src1.value, left + load_store.read_word(memory, data.src2.value, cycle_count), cycle_count);
+                break;
             case OperandType::Immediate:
                 load_store.write_word(memory, data.src1.value, left + data.src2.value, cycle_count);
+                break;
             }
+            int tmp;
+            set_z(load_store.read_word(memory, data.src1.value, tmp) == 0);
             return cycle_count;
         }
     }
@@ -101,16 +113,21 @@ int Execute::sub(InstructionData data, DataCache& load_store, Memory& memory)
     if (is_register_operand(data.src1.type)) {
         if (is_register_operand(data.src2.type)) {
             reg(data.src1) -= reg(data.src2);
+            set_z(reg(data.src1) == 0);
             return cycle_count;
         } else {
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 reg(data.src1) -= load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
             case OperandType::Address:
                 reg(data.src1) -= load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
             case OperandType::Immediate:
                 reg(data.src1) -= data.src2.value;
+                break;
             }
+            set_z(reg(data.src1) == 0);
             return cycle_count;
         }
     } else {
@@ -118,16 +135,23 @@ int Execute::sub(InstructionData data, DataCache& load_store, Memory& memory)
 
         if (is_register_operand(data.src2.type)) {
             load_store.write_word(memory, data.src1.value, left - registers[data.src2.type], cycle_count);
+            int tmp;
+            set_z(load_store.read_word(memory, data.src1.value, tmp) == 0);
             return cycle_count;
         } else {
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 load_store.write_word(memory, data.src1.value, left - load_store.read_word(memory, reg(data.src2), cycle_count), cycle_count);
+                break;
             case OperandType::Address:
                 load_store.write_word(memory, data.src1.value, left - load_store.read_word(memory, data.src2.value, cycle_count), cycle_count);
+                break;
             case OperandType::Immediate:
                 load_store.write_word(memory, data.src1.value, left - data.src2.value, cycle_count);
+                break;
             }
+            int tmp;
+            set_z(load_store.read_word(memory, data.src1.value, tmp) == 0);
             return cycle_count;
         }
     }
@@ -144,10 +168,13 @@ int Execute::mov(InstructionData data, DataCache& load_store, Memory& memory)
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 reg(data.src1) = load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
             case OperandType::Address:
                 reg(data.src1) = load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
             case OperandType::Immediate:
                 reg(data.src1) = data.src2.value;
+                break;
             }
             return cycle_count;
         }
@@ -159,10 +186,13 @@ int Execute::mov(InstructionData data, DataCache& load_store, Memory& memory)
             switch (data.src2.type) {
             case OperandType::AddressInRegister:
                 load_store.write_word(memory, data.src1.value, load_store.read_word(memory, reg(data.src2), cycle_count), cycle_count);
+                break;
             case OperandType::Address:
                 load_store.write_word(memory, data.src1.value, load_store.read_word(memory, data.src2.value, cycle_count), cycle_count);
+                break;
             case OperandType::Immediate:
                 load_store.write_word(memory, data.src1.value, data.src2.value, cycle_count);
+                break;
             }
             return cycle_count;
         }
@@ -171,12 +201,117 @@ int Execute::mov(InstructionData data, DataCache& load_store, Memory& memory)
 
 int Execute::mul(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+    uint64_t result = 0;
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        if (is_register_operand(data.src2.type)) {
+            result = reg(data.src1) * reg(data.src2);
+            set_z(result == 0);
+            registers[0] = result >> 16;
+            registers[1] = result & 0xffff;
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                result = reg(data.src1) * load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
+            case OperandType::Address:
+                result = reg(data.src1) * load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
+            case OperandType::Immediate:
+                result = reg(data.src1) * data.src2.value;
+                break;
+            }
+            set_z(result == 0);
+            registers[0] = result >> 16;
+            registers[1] = result & 0xffff;
+            return cycle_count;
+        }
+    } else {
+        auto left = load_store.read_word(memory, data.src1.value, cycle_count);
+
+        if (is_register_operand(data.src2.type)) {
+            result = left * registers[data.src2.type];
+            set_z(result == 0);
+            registers[0] = result >> 16;
+            registers[1] = result & 0xffff;
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                result = left * load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
+            case OperandType::Address:
+                result = left * load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
+            case OperandType::Immediate:
+                result = left * data.src2.value;
+                break;
+            }
+            set_z(result == 0);
+            registers[0] = result >> 16;
+            registers[1] = result & 0xffff;
+            return cycle_count;
+        }
+    }
 }
 
 int Execute::div(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+
+    int cycle_count = 5;
+    if (is_register_operand(data.src1.type)) {
+        if (is_register_operand(data.src2.type)) {
+            registers[0] = reg(data.src1) / reg(data.src2);
+            registers[1] = reg(data.src1) % reg(data.src2);
+            set_z(registers[0] == 0);
+
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                registers[0] = reg(data.src1) / load_store.read_word(memory, reg(data.src2), cycle_count);
+                registers[1] = reg(data.src1) % load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
+            case OperandType::Address:
+                registers[0] = reg(data.src1) / load_store.read_word(memory, data.src2.value, cycle_count);
+                registers[1] = reg(data.src1) % load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
+            case OperandType::Immediate:
+                registers[0] = reg(data.src1) / data.src2.value;
+                registers[1] = reg(data.src1) % data.src2.value;
+                break;
+            }
+            set_z(registers[0] == 0);
+            return cycle_count;
+        }
+    } else {
+        auto left = load_store.read_word(memory, data.src1.value, cycle_count);
+
+        if (is_register_operand(data.src2.type)) {
+            registers[0] = left / registers[data.src2.type];
+            registers[1] = left % registers[data.src2.type];
+            set_z(registers[0] == 0);
+            return cycle_count;
+        } else {
+            switch (data.src2.type) {
+            case OperandType::AddressInRegister:
+                registers[0] = left / load_store.read_word(memory, reg(data.src2), cycle_count);
+                registers[1] = left % load_store.read_word(memory, reg(data.src2), cycle_count);
+                break;
+            case OperandType::Address:
+                registers[0] = left / load_store.read_word(memory, data.src2.value, cycle_count);
+                registers[1] = left % load_store.read_word(memory, data.src2.value, cycle_count);
+                break;
+            case OperandType::Immediate:
+                registers[0] = left / data.src2.value;
+                registers[1] = left % data.src2.value;
+                break;
+            }
+            set_z(registers[0] == 0);
+            return cycle_count;
+        }
+    }
 }
 
 int Execute::cmp(InstructionData data, DataCache& load_store, Memory& memory)
