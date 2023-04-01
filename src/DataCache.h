@@ -15,6 +15,8 @@ public:
     std::uint16_t read_word(Memory&, uint16_t addr, int& cycle_count);
     void write_word(Memory&, uint16_t addr, uint16_t word, int& cycle_count);
 
+    void reset();
+
 private:
     void populate_cache(Memory& memory, std::uint16_t starting_addr);
 

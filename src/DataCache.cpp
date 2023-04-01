@@ -94,3 +94,12 @@ void DataCache::write_word(Memory& memory, uint16_t addr, uint16_t word, int& cy
         m_packet[m_packet_idx] = word;
     }
 }
+
+void DataCache::reset()
+{
+    m_last_read_address = m_last_write_address = 0;
+    m_has_populated_the_cache = m_has_populated_write_cache = false;
+    memset(m_cache.data(), 0, m_cache.size() * sizeof(uint16_t));
+    m_packet_idx = 0;
+    memset(m_packet, 0, sizeof(m_packet));
+}
