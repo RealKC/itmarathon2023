@@ -10,7 +10,6 @@ DataCache::DataCache()
 
 std::uint64_t DataCache::get_fetch_window(Memory& memory, uint16_t addr, int& cycle_count)
 {
-    auto idx = addr % m_last_read_address;
     if (m_last_read_address <= addr && addr <= m_last_read_address + CACHE_SIZE && m_has_populated_the_cache) {
         cycle_count += 7;
     } else {
@@ -20,6 +19,7 @@ std::uint64_t DataCache::get_fetch_window(Memory& memory, uint16_t addr, int& cy
         cycle_count += 15;
     }
 
+    auto idx = addr % m_last_read_address;
     return static_cast<uint64_t>(m_cache[idx]) << 48
         | static_cast<uint64_t>(m_cache[idx + 1]) << 32
         | static_cast<uint64_t>(m_cache[idx + 2]) << 16

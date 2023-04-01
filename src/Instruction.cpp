@@ -111,7 +111,7 @@ std::string register_to_string(Operand o)
 
 std::string InstructionData::to_string()
 {
-    std::string str = "Instruction: ";
+    std::string str = "";
     switch (opcode) {
     case Opcode::Add:
         str += "add";
@@ -174,7 +174,7 @@ std::string InstructionData::to_string()
     }
 
     if (this->src2.type >= 1 && this->src2.type <= 8) {
-        str += " " + register_to_string(src1);
+        str += " " + register_to_string(src2);
     } else if (this->src2.type == OperandType::Address) {
         str += " [" + std::to_string(src2.value) + "]";
     } else if (this->src2.type == OperandType::AddressInRegister) {
