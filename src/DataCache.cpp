@@ -42,6 +42,11 @@ void DataCache::populate_cache(Memory& memory, std::uint16_t starting_addr)
 
 std::uint16_t DataCache::read_word(Memory& memory, uint16_t addr, int& cycle_count)
 {
+    if ((addr & 1) == 1) {
+        // FIXME: implement exception for misaligned access
+        return 0;
+    }
+
     if (m_last_read_address <= addr && addr <= m_last_read_address + CACHE_SIZE && m_has_populated_the_cache) {
         cycle_count += 7;
     } else {
@@ -57,6 +62,11 @@ std::uint16_t DataCache::read_word(Memory& memory, uint16_t addr, int& cycle_cou
 
 void DataCache::write_word(Memory& memory, uint16_t addr, uint16_t word, int& cycle_count)
 {
+    if ((addr & 1) == 1) {
+        // FIXME: Notify about exception
+        return;
+    }
+
     cycle_count += 15;
 
     // If the write is in cached memory, update the cache
