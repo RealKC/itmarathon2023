@@ -316,7 +316,19 @@ int Execute::div(InstructionData data, DataCache& load_store, Memory& memory)
 
 int Execute::cmp(InstructionData data, DataCache& load_store, Memory& memory)
 {
-    return 0;
+    uint16_t val1, val2;
+    if (is_register_operand(data.src1.type))
+        val1 = reg(data.src1);
+    else
+        val1 = data.src1.value;
+    if (is_register_operand(data.src2.type))
+        val2 = reg(data.src2);
+    else
+        val2 = data.src2.value;
+    set_z(val1 == val2 == 0);
+    set_e(val1 == val2);
+    set_g(val1 > val2);
+    return 5;
 }
 
 int Execute::jmp(InstructionData data, DataCache& load_store, Memory& memory)
@@ -356,6 +368,7 @@ int Execute::ret(InstructionData data, DataCache& load_store, Memory& memory)
 
 int Execute::end_sim(InstructionData data, DataCache& load_store, Memory& memory)
 {
+
     return 0;
 }
 
