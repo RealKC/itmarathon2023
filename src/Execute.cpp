@@ -66,7 +66,11 @@ void Execute::set_g(bool val)
 
 uint16_t& Execute::reg(Operand operand)
 {
-    assert(OperandType::R0 <= operand.type && operand.type <= OperandType::R7);
+    assert((OperandType::R0 <= operand.type && operand.type <= OperandType::R7) || operand.type == AddressInRegister);
+
+    if (operand.type == AddressInRegister) {
+        return registers[operand.value];
+    }
 
     return registers[static_cast<std::size_t>(operand.type - 1)];
 }
