@@ -20,13 +20,13 @@ public:
     int mul(InstructionData, DataCache&, Memory&);
     int div(InstructionData, DataCache&, Memory&);
     int cmp(InstructionData, DataCache&, Memory&);
-    int jmp(InstructionData, DataCache&, Memory&);
-    int je(InstructionData, DataCache&, Memory&);
-    int jl(InstructionData, DataCache&, Memory&);
-    int jg(InstructionData, DataCache&, Memory&);
-    int jz(InstructionData, DataCache&, Memory&);
-    int call(InstructionData, DataCache&, Memory&);
-    int ret(InstructionData, DataCache&, Memory&);
+    int jmp(InstructionData, DataCache&, Memory&, uint16_t&);
+    int je(InstructionData, DataCache&, Memory&, uint16_t&);
+    int jl(InstructionData, DataCache&, Memory&, uint16_t&);
+    int jg(InstructionData, DataCache&, Memory&, uint16_t&);
+    int jz(InstructionData, DataCache&, Memory&, uint16_t&);
+    int call(InstructionData, DataCache&, Memory&, uint16_t&);
+    int ret(InstructionData, DataCache&, Memory&, uint16_t&);
     int end_sim(InstructionData, DataCache&, Memory&);
     int push(InstructionData, DataCache&, Memory&);
     int pop(InstructionData, DataCache&, Memory&);
@@ -37,6 +37,10 @@ private:
     void set_e(bool val);
     void set_g(bool val);
     void set_z(bool val);
+
+    bool get_e();
+    bool get_g();
+    bool get_z();
 
     std::array<uint16_t, 8> registers { 0 };
     uint16_t sp { 0 }, flags { 0 };

@@ -22,6 +22,21 @@ void Execute::reset()
     flags = 0;
 }
 
+bool Execute::get_e()
+{
+    return (flags >> 2) & 1;
+}
+
+bool Execute::get_g()
+{
+    return (flags >> 4) & 1;
+}
+
+bool Execute::get_z()
+{
+    return flags & 1;
+}
+
 void Execute::set_z(bool val)
 {
     if (val) {
@@ -331,44 +346,52 @@ int Execute::cmp(InstructionData data, DataCache& load_store, Memory& memory)
     return 5;
 }
 
-int Execute::jmp(InstructionData data, DataCache& load_store, Memory& memory)
+int Execute::jmp(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
+{
+    ip = data.src1.value;
+    return 5;
+}
+
+int Execute::je(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
+{
+    if (get_e())
+        ip = data.src1.value;
+    return 5;
+}
+
+int Execute::jl(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
+{
+    if (!get_g() && !get_z())
+        ip = data.src1.value;
+    return 0;
+}
+
+int Execute::jg(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
+{
+    if (get_g())
+        ip = data.src1.value;
+    return 0;
+}
+
+int Execute::jz(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
+{
+    if (get_z())
+        ip = data.src1.value;
+    return 0;
+}
+
+int Execute::call(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
     return 0;
 }
 
-int Execute::je(InstructionData data, DataCache& load_store, Memory& memory)
-{
-    return 0;
-}
-
-int Execute::jl(InstructionData data, DataCache& load_store, Memory& memory)
-{
-    return 0;
-}
-
-int Execute::jg(InstructionData data, DataCache& load_store, Memory& memory)
-{
-    return 0;
-}
-
-int Execute::jz(InstructionData data, DataCache& load_store, Memory& memory)
-{
-    return 0;
-}
-
-int Execute::call(InstructionData data, DataCache& load_store, Memory& memory)
-{
-    return 0;
-}
-
-int Execute::ret(InstructionData data, DataCache& load_store, Memory& memory)
+int Execute::ret(InstructionData data, DataCache& load_store, Memory& memory, uint16_t& ip)
 {
     return 0;
 }
 
 int Execute::end_sim(InstructionData data, DataCache& load_store, Memory& memory)
 {
-
     return 0;
 }
 
