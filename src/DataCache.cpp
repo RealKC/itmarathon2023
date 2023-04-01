@@ -74,6 +74,7 @@ void DataCache::write_word(Memory& memory, uint16_t addr, uint16_t word, int& cy
             m_packet[idx] = word;
         }
     } else {
+        m_has_populated_write_cache = true;
         uint64_t packet = static_cast<uint64_t>(m_packet[3]) << 48
             | static_cast<uint64_t>(m_packet[2]) << 32
             | static_cast<uint64_t>(m_packet[1]) << 16
