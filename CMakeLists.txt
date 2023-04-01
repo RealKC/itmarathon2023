@@ -9,4 +9,5 @@ add_executable(itmarathon2023 src/main.cpp
         src/DataCache.cpp src/DataCache.h
         src/Execute.cpp src/Execute.h
         src/InstructionCache.cpp src/InstructionCache.h
+        src/CPU.cpp src/CPU.h
         )
